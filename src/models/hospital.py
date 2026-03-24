@@ -56,8 +56,6 @@ class Hospital:
         if action["action"] == "register":
             p_id = action["patient_id"]
             if action["target"] == "waiting_room":
-                # This is tricky with queues if they're already moved, 
-                # but for initial structure, we'll keep it simple.
                 pass 
             self.all_patients.pop(p_id, None)
         elif action["action"] == "assign_uci":
@@ -67,5 +65,52 @@ class Hospital:
             patient = self.all_patients.get(p_id)
             if patient:
                 patient.status = "Waiting"
+        elif action["action"] == "discharge":
+            bed_idx = action["bed_index"]
+            old_patient = action["patient"]
+            
+            # Check for collision
+            if self.uci_beds[bed_idx] is not None:
+                # Re-push the action since it failed? (Optional)
+                return "Error: No se puede deshacer el alta. La cama ya está ocupada por un nuevo paciente."
+            else:
+                self.uci_beds[bed_idx] = old_patient
+                old_patient.status = "In Bed (UCI)"
+                return "Alta revertida con éxito."
         
         return action
+        
+    # --- New APIs for Triage Flow Tests ---
+    
+    def assign_bed(self, patient):
+        return self.assign_to_uci(patient)
+        
+    def is_icu_full(self):
+        return all(bed is not None for bed in self.uci_beds)
+        
+    def process_arrival(self, patient):
+        if self.is_icu_full() and patient.triage_lvl == 1:
+            return "Alerta: UCI Llena. Iniciando protocolo de desbordamiento."
+        else:
+            self.register_patient(patient.id, patient.name, patient.triage_lvl)
+            return "Paciente procesado."
+
+    def discharge_patient(self, bed_index):
+        if 0 <= bed_index < len(self.uci_beds) and self.uci_beds[bed_index] is not None:
+            patient = self.uci_beds[bed_index]
+            self.uci_beds[bed_index] = None
+            patient.status = "Discharged"
+            self.undo_stack.push({"action": "discharge", "bed_index": bed_index, "patient": patient})
+            return True
+        return False
+        
+    def get_bed(self, bed_index):
+        class BedData:
+            def __init__(self, p):
+                self.patient = p
+                
+        if 0 <= bed_index < len(self.uci_beds):
+            p = self.uci_beds[bed_index]
+            if p is not None:
+                return BedData(p)
+        return None

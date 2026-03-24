@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 from src.models.hospital import Hospital
 from src.models.doctor import Doctor
+from src.analytics import ReportGenerator
 
 # Page Configuration
 st.set_page_config(
@@ -61,6 +62,7 @@ st.markdown("""
 # Initialize Session State
 if 'hospital' not in st.session_state:
     st.session_state.hospital = Hospital()
+    st.session_state.analytics = ReportGenerator()
     # Add initial doctors
     st.session_state.hospital.add_doctor(Doctor(101, "Gabriel Garcia", "Cardiologia"))
     st.session_state.hospital.add_doctor(Doctor(102, "Maria Lopez", "Pediatria"))
@@ -99,6 +101,15 @@ with st.sidebar:
 
 # Main Layout
 st.markdown("<h1 class='main-header'>🏥 Centro de Triage Urgencias V1</h1>", unsafe_allow_html=True)
+
+analytics = st.session_state.analytics
+st.subheader("📊 Reportes y KPIs (Analytics O(1))")
+kpi1, kpi2 = st.columns(2)
+with kpi1:
+    st.info(analytics.get_wait_times(hospital.waiting_room))
+with kpi2:
+    st.success(analytics.get_icu_saturation(hospital.uci_beds))
+st.divider()
 
 col1, col2 = st.columns([2, 1])
 
@@ -152,6 +163,7 @@ with col2:
             interv = st.text_input("Nueva Intervención (Ej: Rayos X)")
             if st.form_submit_button("Añadir al Historial"):
                 selected_p.add_intervention(interv)
+                analytics.index_intervention(selected_p, interv)
                 st.success("Intervención registrada.")
         
         st.write("**Historial Médico (Secuencial):**")
@@ -169,6 +181,17 @@ with col2:
         results = [d for d in hospital.medical_staff if search_q.lower() in d.specialty.lower()]
         for r in results:
             st.write(f"- {r}")
+
+    st.divider()
+    st.subheader("🔬 Búsqueda Avanzada (Hash Map O(1))")
+    search_interv = st.text_input("Filtrar pacientes por intervención (Ej: Rayos X):")
+    if search_interv:
+        results = analytics.get_patients_by_intervention(search_interv)
+        if results:
+            for r in results:
+                st.write(f"- {r.name} (ID: {r.id})")
+        else:
+            st.warning("No se encontraron pacientes con esa intervención.")
 
 st.divider()
 st.caption("Desarrollado para el taller de Estructuras de Datos.")

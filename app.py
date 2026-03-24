@@ -7,6 +7,7 @@ import time
 from src.models.hospital import Hospital
 from src.models.doctor import Doctor
 from src.mock_generator import generate_mock_patients
+from src.analytics import ReportGenerator
 
 # Page Configuration
 st.set_page_config(
@@ -24,7 +25,7 @@ st.markdown("""
     
     /* Global Styles */
     .stApp {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #fecfef 75%, #fecfef 100%);
+        background: radial-gradient(circle at top right, #f8f9fa 0%, #e3f2fd 100%);
         background-attachment: fixed;
         font-family: 'Inter', sans-serif;
     }
@@ -38,7 +39,7 @@ st.markdown("""
     
     /* Header Styles */
     .main-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #1565c0 0%, #0d47a1 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
@@ -628,6 +629,202 @@ if 'hospital' not in st.session_state:
     st.session_state.hospital.add_doctor(Doctor(101, "Gabriel Garcia", "Cardiologia"))
     st.session_state.hospital.add_doctor(Doctor(102, "Maria Lopez", "Pediatria"))
     st.session_state.hospital.add_doctor(Doctor(103, "Juan Perez", "Cirugia"))
+    # Initialize Analytics
+    st.session_state.reporter = ReportGenerator()
+
+# Initialize feedback system
+if 'notifications' not in st.session_state:
+    st.session_state.notifications = []
+
+def show_notification(message, type_msg="success"):
+    """Show animated notification"""
+    notification = {
+        'message': message,
+        'type': type_msg,
+        'timestamp': time.time()
+    }
+    st.session_state.notifications.append(notification)
+    
+def create_occupancy_chart():
+    """Create UCI occupancy chart"""
+    occupied = sum(1 for bed in hospital.uci_beds if bed)
+    free = 15 - occupied
+    
+    fig = go.Figure(data=[go.Pie(
+        labels=['Ocupadas', 'Libres'],
+        values=[occupied, free],
+        hole=0.6,
+        marker_colors=['#ff6b6b', '#4ecdc4'],
+        textinfo='label+percent',
+        textfont_size=14,
+        hovertemplate='<b>%{label}</b><br>Camas: %{value}<br>Porcentaje: %{percent}<extra></extra>'
+    )])
+    
+    fig.update_layout(
+        title={
+            'text': f'🏥 Ocupación UCI: {occupied}/15',
+            'x': 0.5,
+            'font': {'size': 20, 'color': '#667eea'}
+        },
+        font=dict(family="Inter", size=12),
+        showlegend=True,
+        height=300,
+        margin=dict(t=50, b=20, l=20, r=20)
+    )
+    
+    return fig
+
+def create_triage_chart():
+    """Create triage distribution chart"""
+    triage_counts = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0}
+    
+    for patient in hospital.all_patients.values():
+        triage_counts[patient.triage_lvl] += 1
+    
+    # Add waiting room patients
+    waiting_list = hospital.waiting_room.to_list()
+    for patient in waiting_list:
+        triage_counts[patient.triage_lvl] += 1
+    
+    colors = ['#ee5a24', '#feca57', '#48dbfb', '#0abde3', '#006ba6']
+    labels = ['T1 - Emergencia', 'T2 - Urgencia', 'T3 - Urgencia Menor', 'T4 - No Urgente', 'T5 - Consulta']
+    
+    fig = go.Figure(data=[
+        go.Bar(
+            x=labels,
+            y=list(triage_counts.values()),
+            marker_color=colors,
+            text=list(triage_counts.values()),
+            textposition='auto',
+            hovertemplate='<b>%{x}</b><br>Pacientes: %{y}<extra></extra>'
+        )
+    ])
+    
+    fig.update_layout(
+        title={
+            'text': '📊 Distribución de Triage',
+            'x': 0.5,
+            'font': {'size': 20, 'color': '#667eea'}
+        },
+        xaxis_title="Nivel de Triage",
+        yaxis_title="Número de Pacientes",
+        font=dict(family="Inter", size=12),
+        height=300,
+        margin=dict(t=50, b=60, l=40, r=20),
+        showlegend=False
+    )
+    
+    return fig
+
+def create_timeline_chart():
+    """Create patient timeline chart"""
+    import datetime
+    
+    # Get real data from hospital system
+    total_patients = len(hospital.all_patients)
+    
+    # Create hourly distribution based on actual registered patients
+    hours = list(range(24))
+    
+    if total_patients == 0:
+        # No patients registered - show all zeros
+        patients_per_hour = [0] * 24
+    else:
+        # Distribute registered patients throughout the day (simplified logic)
+        # In a real system, you'd track registration timestamps
+        patients_per_hour = [0] * 24
+        
+        # Distribute patients based on typical hospital patterns
+        # Morning: 6-12, Afternoon: 12-18, Evening: 18-24, Night: 0-6
+        morning_hours = list(range(6, 13))    # 6 AM to 12 PM
+        afternoon_hours = list(range(12, 19))  # 12 PM to 6 PM  
+        evening_hours = list(range(19, 24))    # 7 PM to 12 AM
+        night_hours = list(range(0, 6))        # 12 AM to 6 AM
+        
+        # Weight distribution (more patients during peak hours)
+        weights = {
+            'morning': 0.35,    # 35% of patients
+            'afternoon': 0.30,  # 30% of patients
+            'evening': 0.25,    # 25% of patients
+            'night': 0.10       # 10% of patients
+        }
+        
+        # Calculate patient counts per period
+        morning_count = int(total_patients * weights['morning'])
+        afternoon_count = int(total_patients * weights['afternoon'])
+        evening_count = int(total_patients * weights['evening'])
+        night_count = total_patients - morning_count - afternoon_count - evening_count
+        
+        # Distribute patients within each period
+        for hour in morning_hours:
+            if morning_count > 0:
+                patients_per_hour[hour] = min(morning_count // len(morning_hours) + (1 if hour == morning_hours[0] else 0), morning_count)
+        
+        for hour in afternoon_hours:
+            if afternoon_count > 0:
+                patients_per_hour[hour] = min(afternoon_count // len(afternoon_hours) + (1 if hour == afternoon_hours[0] else 0), afternoon_count)
+        
+        for hour in evening_hours:
+            if evening_count > 0:
+                patients_per_hour[hour] = min(evening_count // len(evening_hours) + (1 if hour == evening_hours[0] else 0), evening_count)
+        
+        for hour in night_hours:
+            if night_count > 0:
+                patients_per_hour[hour] = min(night_count // len(night_hours) + (1 if hour == night_hours[0] else 0), night_count)
+    
+    fig = go.Figure(data=[
+        go.Scatter(
+            x=hours,
+            y=patients_per_hour,
+            mode='lines+markers',
+            line=dict(color='#667eea', width=3),
+            marker=dict(size=8, color='#764ba2'),
+            hovertemplate='<b>Hora: %{x}:00</b><br>Pacientes: %{y}<extra></extra>'
+        )
+    ])
+    
+    fig.update_layout(
+        title={
+            'text': f'⏰ Flujo de Pacientes (24h) - Total: {total_patients}',
+            'x': 0.5,
+            'font': {'size': 20, 'color': '#667eea'}
+        },
+        xaxis_title="Hora del Día",
+        yaxis_title="Pacientes Registrados",
+        font=dict(family="Inter", size=12),
+        height=300,
+        margin=dict(t=50, b=60, l=60, r=20),
+        showlegend=False
+    )
+    
+    return fig
+
+def display_notifications():
+    """Display recent notifications"""
+    if st.session_state.notifications:
+        st.markdown("### 🔔 Notificaciones Recientes")
+        for notif in st.session_state.notifications[-3:]:  # Show last 3
+            if notif['type'] == 'success':
+                st.markdown(f"""
+                <div style="background: linear-gradient(135deg, #4ecdc4 0%, #44a3aa 100%); 
+                           color: white; padding: 10px; border-radius: 10px; margin: 5px 0;">
+                    ✅ {notif['message']}
+                </div>
+                """, unsafe_allow_html=True)
+            elif notif['type'] == 'error':
+                st.markdown(f"""
+                <div style="background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%); 
+                           color: white; padding: 10px; border-radius: 10px; margin: 5px 0;">
+                    ❌ {notif['message']}
+                </div>
+                """, unsafe_allow_html=True)
+            elif notif['type'] == 'warning':
+                st.markdown(f"""
+                <div style="background: linear-gradient(135deg, #feca57 0%, #ff9ff3 100%); 
+                           color: white; padding: 10px; border-radius: 10px; margin: 5px 0;">
+                    ⚠️ {notif['message']}
+                </div>
+                """, unsafe_allow_html=True)
 
 # Initialize feedback system
 if 'notifications' not in st.session_state:
@@ -842,10 +1039,11 @@ with st.sidebar:
             else:
                 show_notification("Por favor completa todos los campos", "warning")
 
-    if st.button("↩️ Deshacer Última Acción"):
         result = hospital.undo_last_action()
         if result:
-            show_notification(f"Se revirtió la acción: {result['action']}", "success")
+            msg = result if isinstance(result, str) else result.get('action', 'Acción revertida')
+            show_notification(f"Éxito: {msg}", "success")
+            st.rerun()
         else:
             show_notification("No hay acciones para deshacer", "error")
 
@@ -870,18 +1068,6 @@ with st.sidebar:
             hospital.register_patient(p_data["id"], p_data["name"], p_data["triage_level"])
         st.success("10 pacientes generados y encolados!")
         st.rerun()
-
-    st.divider()
-    st.subheader("💾 Gestión de Datos")
-    if st.button("💾 Guardar Estado"):
-        hospital.save_to_file()
-        st.success("Hospital guardado.")
-    
-    if st.button("📂 Cargar Estado"):
-        new_hospital = Hospital.load_from_file()
-        if new_hospital:
-            st.session_state.hospital = new_hospital
-            st.rerun()
 
     st.divider()
     st.subheader("👨‍⚕️ Personal de Turno")
@@ -1081,6 +1267,9 @@ with col2:
                 if st.form_submit_button("Registrar Intervención"):
                     if interv:
                         selected_p.add_intervention(interv)
+                        # Index for O(1) Search
+                        if 'reporter' in st.session_state:
+                            st.session_state.reporter.index_intervention(selected_p.name, interv)
                         show_notification(f"Intervención '{interv}' añadida a {selected_p_name}", "success")
                     else:
                         show_notification("Por favor ingrese una intervención", "warning")
@@ -1145,6 +1334,20 @@ with col2:
     
     st.markdown('</div>', unsafe_allow_html=True)
 
+    # Cristian's Advanced Search Integration
+    st.markdown('<div class="staff-search-section" style="margin-top: 2rem; border-top: 4px solid #764ba2;">', unsafe_allow_html=True)
+    st.markdown("#### 🔬 Búsqueda Avanzada de Intervenciones (O(1))")
+    st.markdown("<small>Motor de búsqueda por Hash-Map optimizado para reportes hospitalarios.</small>", unsafe_allow_html=True)
+    
+    search_int = st.text_input("🔍 Buscar pacientes por diagnóstico/intervención:", placeholder="Ej: Rayos X, Cirugía...")
+    if search_int:
+        if 'reporter' in st.session_state:
+            matches = st.session_state.reporter.get_patients_by_intervention(search_int)
+            if matches:
+                st.info(f"📍 Pacientes encontrados: {', '.join(matches)}")
+            else:
+                st.warning("No se encontraron pacientes con ese registro.")
+    st.markdown('</div>', unsafe_allow_html=True)
 # Footer
 st.markdown("---")
 st.markdown('<div style="text-align: center; padding: 2rem; color: #6c757d;">', unsafe_allow_html=True)

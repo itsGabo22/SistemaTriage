@@ -1,77 +1,66 @@
-# Sistema de Triage y Flujo de Sala de Urgencias 🏥
+# 🏥 Sistema de Triage y Flujo de Urgencias - Hospital v1.0
 
-Proyecto base modularizado para la clase de **Estructuras de Datos**. 
+Este proyecto es una simulación avanzada de un centro de triage de urgencias, desarrollado para el taller de **Estructuras de Datos**. Integra una interfaz premium con un motor de backend robusto y análisis de datos optimizado.
 
-## 📋 Requisitos Implementados
+---
 
-1.  **Arreglos (Arrays)**: Representación de 15 camas UCI en `Hospital.uci_beds`. Acceso por índice.
-2.  **Colas (Queues)**: Gestión de sala de espera general (Pacientes Triage 4 y 5) en `src/data_structures/queue.py`.
-3.  **Pilas (Stacks)**: Sistema de "Deshacer" (Undo) para revertir registros o asignaciones en `src/data_structures/stack.py`.
-4.  **Listas Nativas**: Directorio de personal médico dinámico en `Hospital.medical_staff`.
-5.  **Listas Simples (Singly Linked Lists)**: Historial de intervenciones por paciente en `src/data_structures/linked_list.py`.
+## 🛠️ Requisitos e Instalación
 
-## 🚀 Cómo Ejecutar
+1. **Clonar el repositorio**:
+   ```bash
+   git clone https://github.com/itsGabo22/SistemaTriage.git
+   cd SistemaTriage
+   ```
 
-1.  Asegúrate de tener Python instalado.
-2.  Crea un entorno virtual (opcional pero recomendado):
-    ```bash
-    python -m venv venv
-    source venv/bin/activate  # En Windows: venv\Scripts\activate
-    ```
-3.  Instala las dependencias:
-    ```bash
-    pip install -r requirements.txt
-    ```
-4.  Ejecuta la aplicación:
-    ```bash
-    streamlit run app.py
-    ```
+2. **Instalar dependencias**:
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-## 👥 División de Tareas (Roadmap)
+3. **Ejecutar la aplicación**:
+   ```bash
+   streamlit run app.py
+   ```
 
-Para completar este proyecto, el equipo se ha dividido las responsabilidades de la siguiente manera:
+---
 
-### 🛠️ Gabo (Gabriel) - Arquitectura & Backend
-- Optimización de las estructuras de datos (`src/data_structures`).
-- Lógica central de gestión hospitalaria en `Hospital.py`.
-- Implementación de persistencia de datos (si se requiere).
+## 🧠 Estructuras de Datos Implementadas
 
-### 🎨 Caliche - Diseño, UX/UI & Visualización Data
-- **Estilo Pro**: Implementar un modo oscuro/claro y mejorar el CSS de las "tarjetas" de paciente.
-- **Gráficos en Tiempo Real**: Usar Plotly para mostrar la ocupación de camas y tiempos de espera.
-- **Dashboard Médico**: Crear una vista de "Monitor de Signos Vitales" (simulado) para pacientes en UCI.
+El proyecto cumple con los requisitos académicos mediante el uso estratégico de diversas estructuras de datos:
 
-### 🧪 Cristian - Datos, Inteligencia & Reportes
-- **Simulador de Emergencias**: Crear un botón que genere 10 pacientes aleatorios para probar la cola.
-- **Reportes PDF/CSV**: Implementar la descarga del historial médico del paciente.
-- **Lógica de Triage**: Crear un asistente que sugiera el nivel de triage basado en síntomas (Ej: "Dolor pecho" -> P1).
-- **Análisis de Datos**: Calcular estadísticas de eficiencia hospitalaria (Ej: tiempo promedio en espera).
+### 1. 🗂️ Arrays (Listas de Acceso Fijo)
+- **Uso**: Implementado en la gestión de las **15 Camas UCI**.
+- **Por qué**: Permite acceso aleatorio $O(1)$ a cualquier cama específica para dar el alta o asignar un paciente basado en disponibilidad inmediata.
 
-## 🤝 Colaboración y Git (Cómo no pisarse el código)
+### 2. ⏳ Colas (Queues - FIFO)
+- **Uso**: Gestiona la **Sala de Espera General** para pacientes con Triage 4 y 5.
+- **Por qué**: Garantiza la justicia en la atención, donde el primer paciente en llegar es el primero en ser atendido (First-In, First-Out).
 
-Para trabajar los 3 al tiempo sin conflictos, sigan estas reglas:
+### 3. ↩️ Pilas (Stacks - LIFO)
+- **Uso**: Motor del sistema **Undo (Deshacer)**.
+- **Por qué**: Almacena el historial de acciones (registros, altas) permitiendo revertir la última operación realizada, siguiendo el principio Last-In, First-Out.
 
-1. **Uso de Ramas (Branches)**: No suban nada directamente a `main`. Cada uno trabaje en su rama:
-   - `git checkout -b feature-backend-gabo`
-   - `git checkout -b feature-ui-caliche`
-   - `git checkout -b feature-tests-cristian`
-2. **Modularidad**:
-   - **Gabo**: Solo toca archivos dentro de `src/data_structures` y `src/models/hospital.py`.
-   - **Caliche**: Solo toca `app.py` y archivos de estilo.
-   - **Cristian**: Crea archivos nuevos en una carpeta `tests/`.
-3. **Pull Requests**: Cuando terminen una mejora, suban su rama y hagan un "Pull Request".
-4. **Fusión Segura (Safe Merge)**: Si alguien más ya unió cambios a `main`:
-   - Primero: `git checkout main` y `git pull origin main`.
-   - Segundo: Vuelve a tu rama: `git checkout mi-rama`.
-   - Tercero: Une los cambios de main a tu rama: `git merge main`.
-   - Cuarto: Resuelve conflictos si los hay (¡aquí es donde Antigravity les ayuda!) y luego sube tu rama.
+### 4. 📜 Listas Simplemente Enlazadas (Singly Linked Lists)
+- **Uso**: Almacena el **Historial de Intervenciones** de cada paciente.
+- **Por qué**: Permite añadir registros médicos de forma dinámica sin necesidad de redimensionar memoria, manteniendo la cronología de la atención.
 
-## 🐛 Errores Conocidos y Soluciones
+### 5. 🔍 Hash-Maps (Diccionarios de Python)
+- **Uso**: Utilizado en el módulo de **Analytics/Reportes**.
+- **Por qué**: Ofrece una búsqueda de pacientes por intervención en tiempo constante $O(1)$, optimizando el rendimiento de la aplicación incluso con grandes volúmenes de datos.
 
-1.  **Errores de Importación**: Se han añadido archivos `__init__.py` para que Python reconozca `src` como un paquete modular.
-2.  **Type Hints**: Se agregaron anotaciones de tipo en `linked_list.py` para evitar advertencias de "NoneType" en el análisis estático.
-3.  **Ambiente Virtual**: Asegúrate de activar tu entorno virtual antes de ejecutar para que Streamlit sea detectado correctamente.
-4.  **Error 403 (Permiso Denegado)**: Si les sale `denied to...`, sigan estos pasos:
-    - **Aceptar Invitación**: Revisen su correo; DEBEN aceptar la invitación de Gabo para ser colaboradores.
-    - **Token de Acceso (PAT)**: Si usan HTTPS, GitHub pide un "Personal Access Token" en lugar de la contraseña. Generen uno en Settings -> Developer Settings -> Personal access tokens.
-    - **Credenciales en Windows**: Vayan a "Panel de Control" -> "Cuentas de Usuario" -> "Administrador de credenciales" -> "Credenciales de Windows" y eliminen la de `git:https://github.com` para que les pida el nuevo token.
+---
+
+## 👨‍💻 Equipo de Desarrollo
+- **Gabo (itsGabo22)**: Lógica Core, Estructuras de Datos y Persistencia.
+- **Caliche**: Diseño UI/UX Premium, Animaciones CSS y Gráficos Plotly.
+- **Cristian**: Generador de Datos (Mock), Analítica O(1) y Testing.
+
+---
+
+## 🧪 Pruebas Unitarias
+El sistema incluye una suite de pruebas para validar la integridad de las estructuras:
+- `python tests_triage.py`: Valida el flujo de urgencias y colisiones de Undo.
+- `python tests_ds.py`: Valida el funcionamiento técnico de las estructuras personalizadas.
+
+---
+*Desarrollado para el taller de Estructuras de Datos - 2024*

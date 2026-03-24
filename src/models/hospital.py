@@ -46,6 +46,20 @@ class Hospital:
                 return True
         return False
 
+    def assign_bed(self, patient):
+        """English alias for assign_to_uci to satisfy test suite."""
+        return self.assign_to_uci(patient)
+
+    def is_icu_full(self):
+        """Check if all beds in the ICU are occupied."""
+        return all(bed is not None for bed in self.uci_beds)
+
+    def get_bed(self, index):
+        """Retrieve a patient from a specific bed index."""
+        if 0 <= index < len(self.uci_beds):
+            return self.uci_beds[index]
+        return None
+
     def discharge_patient(self, bed_index):
         """Release a bed and set patient status to Discharged."""
         if 0 <= bed_index < len(self.uci_beds):
@@ -53,7 +67,8 @@ class Hospital:
             if patient:
                 patient.status = "Discharged"
                 self.uci_beds[bed_index] = None
-                self.undo_stack.push({"action": "discharge", "patient_id": patient.id, "bed_index": bed_index})
+                # Save patient state for undo
+                self.undo_stack.push({"action": "discharge", "patient": patient, "bed_index": bed_index})
                 # Check if someone from waiting room can take the bed
                 self.process_waiting_room()
                 return True

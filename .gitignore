@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.env
+.venv
+env/
+env.bak/
+venv.bak/
+
+# Streamlit
+.streamlit/
+hospital_data.json
+
+# IDE
+.vscode/
+.idea/
+*.swp

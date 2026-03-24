@@ -7,7 +7,7 @@ class Patient:
         self.name = name
         self.triage_lvl = triage_lvl  # 1 (Emergency) to 5 (Non-urgent)
         self.history = SinglyLinkedList()
-        self.status = "Waiting" # Waiting, In Bed, Discharged
+        self.status: str = "Waiting" # Waiting, In Bed, Discharged
 
     def add_intervention(self, description):
         """Add a medical procedure to the patient's history."""

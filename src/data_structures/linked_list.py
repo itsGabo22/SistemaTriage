@@ -4,7 +4,7 @@ class Node:
     """A node in a singly linked list."""
     def __init__(self, data=None):
         self.data = data
-        self.next: Optional['Node'] = None
+        self.next: Optional[Node] = None
 
 class SinglyLinkedList:
     """Custom implementation of a Singly Linked List for intervention history."""
@@ -26,11 +26,33 @@ class SinglyLinkedList:
                 current.next = new_node
         self.size += 1
 
+    def delete(self, data):
+        """Remove the first occurrence of data in the list."""
+        if self.head is None:
+            return False
+        
+        if self.head.data == data:
+            self.head = self.head.next
+            self.size -= 1
+            return True
+            
+        current = self.head
+        while current is not None:
+            # Check current.next explicitly
+            next_node = current.next
+            if next_node is not None:
+                if next_node.data == data:
+                    current.next = next_node.next
+                    self.size -= 1
+                    return True
+            current = next_node
+        return False
+
     def to_list(self):
         """Convert the linked list to a Python list for easier display."""
         items = []
         current = self.head
-        while current:
+        while current is not None:
             items.append(current.data)
             current = current.next
         return items

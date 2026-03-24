@@ -123,14 +123,14 @@ st.markdown("""
     .uci-bed.occupied {
         background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
         border-color: #ee5a24;
-        color: white;
+        color: #000000;
         animation: pulse-red 2s infinite;
     }
     
     .uci-bed.free {
         background: linear-gradient(135deg, #4ecdc4 0%, #44a3aa 100%);
         border-color: #44a3aa;
-        color: white;
+        color: #000000;
         animation: pulse-green 2s infinite;
     }
     
@@ -143,7 +143,7 @@ st.markdown("""
     .priority-pill {
         padding: 4px 12px;
         border-radius: 20px;
-        color: white;
+        color: #000000;
         font-size: 0.75rem;
         font-weight: 600;
         text-transform: uppercase;
@@ -167,7 +167,7 @@ st.markdown("""
     /* Button Styles */
     .stButton > button {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
-        color: white !important;
+        color: #000000 !important;
         border: none !important;
         border-radius: 10px !important;
         font-weight: 600 !important;
@@ -209,25 +209,25 @@ st.markdown("""
     .stSuccess {
         background: linear-gradient(135deg, #4ecdc4 0%, #44a3aa 100%) !important;
         border-radius: 10px !important;
-        color: white !important;
+        color: #000000 !important;
     }
     
     .stError {
         background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%) !important;
         border-radius: 10px !important;
-        color: white !important;
+        color: #000000 !important;
     }
     
     .stWarning {
         background: linear-gradient(135deg, #feca57 0%, #ff9ff3 100%) !important;
         border-radius: 10px !important;
-        color: white !important;
+        color: #000000 !important;
     }
     
     .stInfo {
         background: linear-gradient(135deg, #48dbfb 0%, #0abde3 100%) !important;
         border-radius: 10px !important;
-        color: white !important;
+        color: #000000 !important;
     }
     
     /* Animations */
@@ -1001,21 +1001,21 @@ def display_notifications():
             if notif['type'] == 'success':
                 st.markdown(f"""
                 <div style="background: linear-gradient(135deg, #4ecdc4 0%, #44a3aa 100%); 
-                           color: white; padding: 10px; border-radius: 10px; margin: 5px 0;">
+                           color: #000000; padding: 10px; border-radius: 10px; margin: 5px 0;">
                     ✅ {notif['message']}
                 </div>
                 """, unsafe_allow_html=True)
             elif notif['type'] == 'error':
                 st.markdown(f"""
                 <div style="background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%); 
-                           color: white; padding: 10px; border-radius: 10px; margin: 5px 0;">
+                           color: #000000; padding: 10px; border-radius: 10px; margin: 5px 0;">
                     ❌ {notif['message']}
                 </div>
                 """, unsafe_allow_html=True)
             elif notif['type'] == 'warning':
                 st.markdown(f"""
                 <div style="background: linear-gradient(135deg, #feca57 0%, #ff9ff3 100%); 
-                           color: white; padding: 10px; border-radius: 10px; margin: 5px 0;">
+                           color: #000000; padding: 10px; border-radius: 10px; margin: 5px 0;">
                     ⚠️ {notif['message']}
                 </div>
                 """, unsafe_allow_html=True)

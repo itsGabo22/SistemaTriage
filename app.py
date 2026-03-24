@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 from src.models.hospital import Hospital
 from src.models.doctor import Doctor
+from src.mock_generator import generate_mock_patients
 
 # Page Configuration
 st.set_page_config(
@@ -91,6 +92,16 @@ with st.sidebar:
             st.info(f"Se revirtió la acción: {result['action']}")
         else:
             st.error("No hay acciones para deshacer.")
+
+    st.divider()
+    st.subheader("🧪 Pruebas y Simulación")
+    if st.button("🚀 Generar 10 Pacientes (Mock)"):
+        new_patients = generate_mock_patients(10)
+        for p_data in new_patients:
+            # Register in hospital
+            hospital.register_patient(p_data["id"], p_data["name"], p_data["triage_level"])
+        st.success("10 pacientes generados y encolados!")
+        st.rerun()
 
     st.divider()
     st.subheader("💾 Gestión de Datos")

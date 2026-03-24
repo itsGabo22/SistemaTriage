@@ -71,3 +71,7 @@ Para trabajar los 3 al tiempo sin conflictos, sigan estas reglas:
 1.  **Errores de Importación**: Se han añadido archivos `__init__.py` para que Python reconozca `src` como un paquete modular.
 2.  **Type Hints**: Se agregaron anotaciones de tipo en `linked_list.py` para evitar advertencias de "NoneType" en el análisis estático.
 3.  **Ambiente Virtual**: Asegúrate de activar tu entorno virtual antes de ejecutar para que Streamlit sea detectado correctamente.
+4.  **Error 403 (Permiso Denegado)**: Si les sale `denied to...`, sigan estos pasos:
+    - **Aceptar Invitación**: Revisen su correo; DEBEN aceptar la invitación de Gabo para ser colaboradores.
+    - **Token de Acceso (PAT)**: Si usan HTTPS, GitHub pide un "Personal Access Token" en lugar de la contraseña. Generen uno en Settings -> Developer Settings -> Personal access tokens.
+    - **Credenciales en Windows**: Vayan a "Panel de Control" -> "Cuentas de Usuario" -> "Administrador de credenciales" -> "Credenciales de Windows" y eliminen la de `git:https://github.com` para que les pida el nuevo token.

@@ -42,7 +42,7 @@ Para completar este proyecto, el equipo se ha dividido las responsabilidades de 
 - Responsividad de los paneles en Streamlit.
 
 ### 🧪 Cristian - Datos & Verificación
-- Generación de datos de prueba (Mock Data).
+- Generación de datos de prueba (Mock Data). *Nuestra generación de datos contempla Casos Extremos (Edge Cases).*
 - Implementación de pruebas integrales para el flujo de triage.
 - Lógica de búsqueda avanzada y reportes históricos.
 

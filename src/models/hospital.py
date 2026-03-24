@@ -1,3 +1,5 @@
+import json
+import os
 from src.data_structures.queue import Queue
 from src.data_structures.stack import Stack
 from src.models.patient import Patient
@@ -44,6 +46,34 @@ class Hospital:
                 return True
         return False
 
+    def discharge_patient(self, bed_index):
+        """Release a bed and set patient status to Discharged."""
+        if 0 <= bed_index < len(self.uci_beds):
+            patient = self.uci_beds[bed_index]
+            if patient:
+                patient.status = "Discharged"
+                self.uci_beds[bed_index] = None
+                self.undo_stack.push({"action": "discharge", "patient_id": patient.id, "bed_index": bed_index})
+                # Check if someone from waiting room can take the bed
+                self.process_waiting_room()
+                return True
+        return False
+
+    def process_waiting_room(self):
+        """Check if beds are available for patients in the waiting room."""
+        if not self.waiting_room.is_empty():
+            # Find first empty bed
+            for i in range(len(self.uci_beds)):
+                if self.uci_beds[i] is None:
+                    next_patient = self.waiting_room.dequeue()
+                    if next_patient:
+                        self.uci_beds[i] = next_patient
+                        next_patient.status = "In Bed (UCI)"
+                        self.undo_stack.push({"action": "auto_assign", "patient_id": next_patient.id, "bed_index": i})
+                        # Recursively process if more beds/patients exist
+                        self.process_waiting_room()
+                        break
+
     def add_doctor(self, doctor):
         self.medical_staff.append(doctor)
 
@@ -69,3 +99,56 @@ class Hospital:
                 patient.status = "Waiting"
         
         return action
+
+    def save_to_file(self, filename="hospital_data.json"):
+        """Save current hospital state to a JSON file."""
+        data = {
+            "num_uci_beds": len(self.uci_beds),
+            "all_patients": [
+                {
+                    "id": getattr(p, 'id', 'unknown'),
+                    "name": getattr(p, 'name', 'unknown'),
+                    "triage_lvl": getattr(p, 'triage_lvl', 5),
+                    "status": getattr(p, 'status', 'unknown'),
+                    "history": p.history.to_list() if hasattr(p, 'history') else []
+                } for p in self.all_patients.values() if p is not None
+            ],
+            # We don't save medical_staff for brevity, but could be added
+            "uci_beds_ids": [p.id if p else None for p in self.uci_beds],
+            "waiting_room_ids": [p.id for p in self.waiting_room.to_list()]
+        }
+        with open(filename, 'w') as f:
+            json.dump(data, f, indent=4)
+        return True
+
+    @classmethod
+    def load_from_file(cls, filename="hospital_data.json"):
+        """Load hospital state from a JSON file."""
+        if not os.path.exists(filename):
+            return None
+            
+        with open(filename, 'r') as f:
+            data = json.load(f)
+            
+        hospital = cls(data["num_uci_beds"])
+        
+        # Restore all patients
+        for p_data in data["all_patients"]:
+            p = Patient(p_data["id"], p_data["name"], p_data["triage_lvl"])
+            p.status = p_data["status"]
+            for h_item in p_data["history"]:
+                p.add_intervention(h_item)
+            hospital.all_patients[p.id] = p
+            
+        # Restore UCI beds
+        for i, p_id in enumerate(data["uci_beds_ids"]):
+            if p_id:
+                hospital.uci_beds[i] = hospital.all_patients.get(p_id)
+                
+        # Restore Waiting Room
+        for p_id in data["waiting_room_ids"]:
+            p = hospital.all_patients.get(p_id)
+            if p:
+                hospital.waiting_room.enqueue(p)
+                
+        return hospital

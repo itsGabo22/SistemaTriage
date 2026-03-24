@@ -36,15 +36,35 @@ Para completar este proyecto, el equipo se ha dividido las responsabilidades de 
 - Lógica central de gestión hospitalaria en `Hospital.py`.
 - Implementación de persistencia de datos (si se requiere).
 
-### 🎨 Caliche - Diseño & UX/UI
-- Estilo premium del Dashboard usando CSS custom.
-- Mejora de la experiencia de usuario (gráficos, alertas, feedback visual).
-- Responsividad de los paneles en Streamlit.
+### 🎨 Caliche - Diseño, UX/UI & Visualización Data
+- **Estilo Pro**: Implementar un modo oscuro/claro y mejorar el CSS de las "tarjetas" de paciente.
+- **Gráficos en Tiempo Real**: Usar Plotly para mostrar la ocupación de camas y tiempos de espera.
+- **Dashboard Médico**: Crear una vista de "Monitor de Signos Vitales" (simulado) para pacientes en UCI.
 
-### 🧪 Cristian - Datos & Verificación
-- Generación de datos de prueba (Mock Data).
-- Implementación de pruebas integrales para el flujo de triage.
-- Lógica de búsqueda avanzada y reportes históricos.
+### 🧪 Cristian - Datos, Inteligencia & Reportes
+- **Simulador de Emergencias**: Crear un botón que genere 10 pacientes aleatorios para probar la cola.
+- **Reportes PDF/CSV**: Implementar la descarga del historial médico del paciente.
+- **Lógica de Triage**: Crear un asistente que sugiera el nivel de triage basado en síntomas (Ej: "Dolor pecho" -> P1).
+- **Análisis de Datos**: Calcular estadísticas de eficiencia hospitalaria (Ej: tiempo promedio en espera).
+
+## 🤝 Colaboración y Git (Cómo no pisarse el código)
+
+Para trabajar los 3 al tiempo sin conflictos, sigan estas reglas:
+
+1. **Uso de Ramas (Branches)**: No suban nada directamente a `main`. Cada uno trabaje en su rama:
+   - `git checkout -b feature-backend-gabo`
+   - `git checkout -b feature-ui-caliche`
+   - `git checkout -b feature-tests-cristian`
+2. **Modularidad**:
+   - **Gabo**: Solo toca archivos dentro de `src/data_structures` y `src/models/hospital.py`.
+   - **Caliche**: Solo toca `app.py` y archivos de estilo.
+   - **Cristian**: Crea archivos nuevos en una carpeta `tests/`.
+3. **Pull Requests**: Cuando terminen una mejora, suban su rama y hagan un "Pull Request".
+4. **Fusión Segura (Safe Merge)**: Si alguien más ya unió cambios a `main`:
+   - Primero: `git checkout main` y `git pull origin main`.
+   - Segundo: Vuelve a tu rama: `git checkout mi-rama`.
+   - Tercero: Une los cambios de main a tu rama: `git merge main`.
+   - Cuarto: Resuelve conflictos si los hay (¡aquí es donde Antigravity les ayuda!) y luego sube tu rama.
 
 ## 🐛 Errores Conocidos y Soluciones
 

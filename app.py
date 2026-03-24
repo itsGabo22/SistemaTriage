@@ -93,6 +93,18 @@ with st.sidebar:
             st.error("No hay acciones para deshacer.")
 
     st.divider()
+    st.subheader("💾 Gestión de Datos")
+    if st.button("💾 Guardar Estado"):
+        hospital.save_to_file()
+        st.success("Hospital guardado.")
+    
+    if st.button("📂 Cargar Estado"):
+        new_hospital = Hospital.load_from_file()
+        if new_hospital:
+            st.session_state.hospital = new_hospital
+            st.rerun()
+
+    st.divider()
     st.subheader("👨‍⚕️ Personal de Turno")
     for doc in hospital.medical_staff:
         st.write(f"- {doc}")
@@ -117,6 +129,9 @@ with col1:
                     <small>ID: {bed_status.id}</small>
                 </div>
                 """, unsafe_allow_html=True)
+                if st.button(f"Dar Alta #{i+1}", key=f"dch_{i}"):
+                    hospital.discharge_patient(i)
+                    st.rerun()
             else:
                 st.markdown(f"""
                 <div class="uci-bed free">

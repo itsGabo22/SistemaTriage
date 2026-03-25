@@ -28,6 +28,11 @@ st.markdown("""
         background: radial-gradient(circle at top right, #f8f9fa 0%, #e3f2fd 100%);
         background-attachment: fixed;
         font-family: 'Inter', sans-serif;
+        color: #000000 !important;
+    }
+    
+    h1, h2, h3, h4, h5, h6, p, li, span, label, div {
+        color: #000000 !important;
     }
     
     /* Main Container */
@@ -39,10 +44,7 @@ st.markdown("""
     
     /* Header Styles */
     .main-header {
-        background: linear-gradient(135deg, #1565c0 0%, #0d47a1 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
+        color: #0d47a1 !important;
         font-family: 'Inter', sans-serif;
         font-weight: 900;
         font-size: 3rem;
@@ -185,6 +187,7 @@ st.markdown("""
     .stTextInput > div > div > input,
     .stSelectbox > div > div > select {
         background: rgba(255,255,255,0.9) !important;
+        color: #000000 !important;
         border: 2px solid rgba(102, 126, 234, 0.3) !important;
         border-radius: 10px !important;
         transition: all 0.3s ease !important;
@@ -324,10 +327,7 @@ st.markdown("""
     
     /* Section headers */
     h3 {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
+        color: #667eea !important;
         font-weight: 700;
         margin-bottom: 1.5rem;
         padding-bottom: 0.5rem;
@@ -1093,8 +1093,8 @@ with st.container():
         st.markdown(f"""
         <div class="card metrics-card" style="text-align: center; min-height: 140px;">
             <h3 style="color: #667eea; margin: 0; font-size: 2rem;">👥</h3>
-            <h2 style="margin: 10px 0; color: #1a1a1a; font-size: 2.5rem;">{total_patients}</h2>
-            <p style="margin: 0; color: #666; font-weight: 500;">Total Pacientes</p>
+            <h2 style="margin: 10px 0; color: #000000; font-size: 2.5rem;">{total_patients}</h2>
+            <p style="margin: 0; color: #000000; font-weight: 500;">Total Pacientes</p>
         </div>
         """, unsafe_allow_html=True)
 
@@ -1103,8 +1103,8 @@ with st.container():
         st.markdown(f"""
         <div class="card metrics-card" style="text-align: center; min-height: 140px;">
             <h3 style="color: #ff6b6b; margin: 0; font-size: 2rem;">🛏️</h3>
-            <h2 style="margin: 10px 0; color: #1a1a1a; font-size: 2.5rem;">{occupied_beds}/15</h2>
-            <p style="margin: 0; color: #666; font-weight: 500;">Camas Ocupadas</p>
+            <h2 style="margin: 10px 0; color: #000000; font-size: 2.5rem;">{occupied_beds}/15</h2>
+            <p style="margin: 0; color: #000000; font-weight: 500;">Camas Ocupadas</p>
         </div>
         """, unsafe_allow_html=True)
 
@@ -1113,8 +1113,8 @@ with st.container():
         st.markdown(f"""
         <div class="card metrics-card" style="text-align: center; min-height: 140px;">
             <h3 style="color: #feca57; margin: 0; font-size: 2rem;">⏳</h3>
-            <h2 style="margin: 10px 0; color: #1a1a1a; font-size: 2.5rem;">{waiting_count}</h2>
-            <p style="margin: 0; color: #666; font-weight: 500;">En Espera</p>
+            <h2 style="margin: 10px 0; color: #000000; font-size: 2.5rem;">{waiting_count}</h2>
+            <p style="margin: 0; color: #000000; font-weight: 500;">En Espera</p>
         </div>
         """, unsafe_allow_html=True)
 
@@ -1123,8 +1123,8 @@ with st.container():
         st.markdown(f"""
         <div class="card metrics-card" style="text-align: center; min-height: 140px;">
             <h3 style="color: #4ecdc4; margin: 0; font-size: 2rem;">👨‍⚕️</h3>
-            <h2 style="margin: 10px 0; color: #1a1a1a; font-size: 2.5rem;">{staff_count}</h2>
-            <p style="margin: 0; color: #666; font-weight: 500;">Personal Médico</p>
+            <h2 style="margin: 10px 0; color: #000000; font-size: 2.5rem;">{staff_count}</h2>
+            <p style="margin: 0; color: #000000; font-weight: 500;">Personal Médico</p>
         </div>
         """, unsafe_allow_html=True)
 
